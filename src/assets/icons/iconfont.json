@@ -1,0 +1,30 @@
+{
+  "id": "2265321",
+  "name": "lvsoso",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1350111",
+      "name": "缩略图",
+      "font_class": "pic",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "11474331",
+      "name": "rising",
+      "font_class": "rising",
+      "unicode": "e703",
+      "unicode_decimal": 59139
+    },
+    {
+      "icon_id": "12387128",
+      "name": "飞机",
+      "font_class": "feiji",
+      "unicode": "e90a",
+      "unicode_decimal": 59658
+    }
+  ]
+}
