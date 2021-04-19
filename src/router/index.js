@@ -104,7 +104,7 @@ export const asyncRoutes = [
     path: '/car',
     component: Layout,
     redirect: '/car/index',
-    meta: { title: '购物车管理', icon: 'form', roles: [] },
+    meta: { title: '购物车管理', icon: 'el-icon-shopping-cart-full', roles: [] },
     name: 'Example',
     children: [
       {

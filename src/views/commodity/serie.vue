@@ -64,6 +64,12 @@
 
         <el-table-column align="center" label="系列名称" prop="name" width="250px" />
 
+        <el-table-column align="center" label="系列图片" prop="cateImg" width="250px">
+          <template slot-scope="scope">
+            <img style="width: 100px;height: 100px;" :src="scope.row.cateImg" alt="" srcset="">
+          </template>
+        </el-table-column>
+
         <el-table-column align="center" label="描述" width="300" prop="desc">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
@@ -132,11 +138,12 @@
     </div>
 
     <div>
-      <!-- 修改内容 弹窗 -->
+      <!-- 内容 弹窗 -->
       <el-dialog
         :title="title"
         :visible.sync="showContentDialog"
-        width="50%"
+        width="52%"
+        style="min-width: 900px;"
       >
         <el-form ref="ruleForm" :inline="true" :model="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
 
@@ -146,11 +153,35 @@
           <el-form-item label="描述" prop="desc">
             <el-input v-model="ruleForm.desc" class="dialog_input" />
           </el-form-item>
+          <br>
+          <el-form-item label="系列图片" prop="cateImg">
+            <el-upload
+              class="avatar-uploader"
+              action="#"
+              :show-file-list="false"
+              :http-request="()=>{return false}"
+              :before-upload="beforeAvatarUpload"
+            >
+              <div
+                v-loading="imgLoading"
+                :element-loading-text="imgText"
+                :element-loading-spinner="imgIcon"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
+              >
+                <img v-if="ruleForm.cateImg" :src="ruleForm.cateImg" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon" />
+              </div>
+            </el-upload>
+          </el-form-item>
         </el-form>
         <br>
         <span slot="footer" class="dialog-footer">
           <el-button @click="showContentDialog = false">取 消</el-button>
-          <el-button type="primary" @click="submitForm('ruleForm')">{{ buttonContent }}</el-button>
+          <el-button
+            :disabled="buttonType"
+            type="primary"
+            @click="submitForm('ruleForm')"
+          >{{ buttonContent }}</el-button>
         </span>
       </el-dialog>
 
@@ -161,16 +192,7 @@
       >
         <img width="100%" :src="dialogImageUrl" alt="">
       </el-dialog>
-      <!-- 律师函文件上传 -->
-      <el-dialog
-        title="律师函文件上传"
-        :visible.sync="fileDialogVisible"
-        width="30%"
-      >
-        <input id="file" type="file" name="file">
-        <br><br>
-        <el-button type="primary" @click="upload()">确 定</el-button>
-      </el-dialog>
+
     </div>
   </div>
 </template>
@@ -178,7 +200,7 @@
 <script>
 import { getList, updata, serieAdd } from '@/api/serie'
 import { timestampToTime } from '@/utils/time'
-import axios from 'axios'
+import { ossRequest } from '@/api/user'
 
 import '@/assets/icons/iconfont.css'
 
@@ -235,7 +257,14 @@ export default {
       fileList: [],
 
       // 上传文件 设置
-      ossUrl: '',
+      ossUrl: 'http://jewelry3510.com/api/getsign',
+      local: 'https://jewelry-1304044450.cos.ap-guangzhou.myqcloud.com/admin/',
+      addImageUrl: '',
+      imageUrl: '',
+      imgLoading: false,
+      imgIcon: 'el-icon-loading',
+      imgText: '图片上传中',
+      buttonType: false,
 
       // 表单信息
       ruleForm: {
@@ -258,6 +287,9 @@ export default {
         ],
         desc: [
           { required: true, message: '描述', trigger: 'blur' }
+        ],
+        cateImg: [
+          { required: true, message: '系列图片', trigger: 'blur' }
         ]
       }
     }
@@ -299,42 +331,43 @@ export default {
         this.fetchList()
       })
     },
-    upload() {
-      var getSuffix = function(fileName) {
-        var pos = fileName.lastIndexOf('.')
+    // 提交 文件
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isPNG = file.type === 'image/png'
+      const isLt2M = file.size / 1024 / 1024 < 2
+      this.imgText = '图片上传中'
+      this.buttonType = true
+      this.imgLoading = true
+
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG或PNG 格式!')
+        return false
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+        return false
+      }
+
+      var getSuffix = function(filename) {
+        var pos = filename.lastIndexOf('.')
         var suffix = ''
         if (pos !== -1) {
-          suffix = fileName.substring(pos)
-        }
-        if (suffix !== '.pdf') {
-          return false
+          suffix = filename.substring(pos)
         }
         return suffix
       }
 
-      var file = document.getElementById('file').value
-      if (file.length === 0) {
-        alert('请选择文件')
-        return
-      }
-      if (getSuffix(file) === false) {
-        alert('请选择pdf文件')
-        return
-      }
-
-      var filename = new Date().getTime() + getSuffix(file)
+      var filename = new Date().getTime() + getSuffix(file.name)
       var formData = new FormData()
-      // 如果是base64文件，那么直接把base64字符串转成blob对象进行上传就可以了
-      formData.append('file', document.getElementById('file').files[0])
-      console.log('document.getElementById ', document.getElementById('file').files[0])
+      formData.append('key', filename) // 存储在oss的文件路径
+      formData.append('file', file)
 
-      formData.append('success_action_status', 200) // 成功后返回的操作码
-
-      var fileUrl = this.ossUrl + '/' + this.dir + filename
-      axios.post(this.ossUrl, formData).then((response) => {
-        this.updata.push_file = fileUrl
-        this.updataSerie()
-        this.fileDialogVisible = false
+      const fileUrl = this.local + filename
+      ossRequest(formData).then(response => {
+        this.ruleForm.cateImg = fileUrl
+        this.buttonType = false
+        this.imgLoading = false
       })
     },
     //  分页
@@ -474,6 +507,30 @@ export default {
   margin-top: 5px;
   margin-left: 2px;
   margin-right: 2px;
+}
+/*  */
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>
 

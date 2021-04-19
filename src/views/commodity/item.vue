@@ -191,7 +191,7 @@
     </div>
 
     <div>
-      <!-- 附件 -->
+
       <el-dialog
         title="轮播图编辑"
         :visible.sync="showFileDialog"
@@ -236,13 +236,15 @@
         :title="title"
         :visible.sync="showContentDialog"
         width="52%"
+        style="min-width: 900px;"
+
       >
         <el-form ref="ruleForm" :inline="true" :model="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
           <el-form-item label="商品名称" prop="name">
             <el-input v-model="ruleForm.name" class="dialog_input" />
           </el-form-item>
           <el-form-item label="价格" prop="price">
-            <el-input type="number" v-model="ruleForm.price" class="dialog_input" />
+            <el-input v-model="ruleForm.price" type="number" class="dialog_input" />
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="ruleForm.status" class="dialog_input">
@@ -315,7 +317,6 @@
           <el-button
             type="primary"
             :disabled="buttonType"
-
             @click="submitForm('ruleForm')"
           >{{ buttonContent }}</el-button>
         </span>
@@ -388,8 +389,6 @@ export default {
       dateSelect: '',
       // 附件列表
       fileList: [],
-      // 律师函文件
-      push_file: '',
 
       // 上传文件 设置
       ossUrl: 'http://jewelry3510.com/api/getsign',
@@ -519,8 +518,6 @@ export default {
 
     // 点击附件图标
     viewFile(row, index) {
-      console.log('row: ', row)
-      console.log('index: ', index)
       const file = row.rollImg
       this.showFileDialog = true
       this.rollImg_guid = row.guid

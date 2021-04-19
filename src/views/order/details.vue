@@ -182,7 +182,6 @@ export default {
           item_info.quantity = temp[i].quantity
           this.itemList.push(item_info)
         }
-        console.log('this.itemList: ', this.itemList)
       })
     },
     // 10位时间戳转换

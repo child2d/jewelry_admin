@@ -160,7 +160,6 @@ export default {
       })
       getComment(this.params).then(response => {
         this.commentData = response
-        console.log('this.commentData : ', this.commentData)
       })
     },
     tabChange(tab, event) {

@@ -25,7 +25,6 @@
 
 <script>
 // import { getOssSign } from '@/api/user'
-import axios from 'axios'
 
 export default {
   data() {

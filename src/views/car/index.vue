@@ -91,8 +91,8 @@
               v-permission="'/car/info'"
               size="small"
               type="warning"
-              @click="detailsInfo(scope.row.guid)"
             >查看详情</el-button>
+            <!-- @click="detailsInfo(scope.row.guid)" -->
           </template>
         </el-table-column>
       </el-table>
@@ -350,7 +350,6 @@ export default {
 
     // 点击附件图标
     viewFile(file) {
-      console.log('file: ', file)
       this.showFileDialog = true
       const filelist = JSON.parse(file)
       this.fileList = filelist

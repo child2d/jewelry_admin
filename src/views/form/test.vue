@@ -38,7 +38,6 @@ export default {
       }
 
       var filename = new Date().getTime() + getSuffix(file.name)
-      console.log('filename: ', filename)
       var formData = new FormData()
 
       formData.append('key', filename)
@@ -49,7 +48,6 @@ export default {
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
-      console.log('file.url: ', file.url)
       this.dialogVisible = true
     },
     handleDownload(file) {
@@ -59,16 +57,3 @@ export default {
 }
 </script>
 
-<style  scoped>
-.ee /deep/ .el-upload--picture-card {
-  margin-top: 20px;
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
-}
-
-.ee /deep/ .el-upload-list--picture-card .el-upload-list__item {
-  width: 100px;
-  height: 100px;
-}
-</style>

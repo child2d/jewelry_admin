@@ -111,13 +111,7 @@
               :disabled="scope.row.status !== 2"
               @click="shipment(scope.row.order_num)"
             >发货</el-button>
-            <el-button
-              v-permission="'/order/refund'"
-              size="small"
-              type="primary"
-              :disabled="scope.row.status !== 4"
-              @click="open(scope.row.order_num,scope.row.car_guid)"
-            >取消订单</el-button>
+
           </template>
         </el-table-column>
       </el-table>
@@ -243,7 +237,6 @@ export default {
     },
     //  跳转
     detailsInfo(row) {
-      console.log('row: ', row)
       const user_guid = row.user_guid
       const order_num = row.order_num
       const carInfo = this.$router.resolve({
